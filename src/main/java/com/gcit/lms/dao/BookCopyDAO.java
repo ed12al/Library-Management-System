@@ -26,31 +26,19 @@ public class BookCopyDAO extends BaseDAO implements RowMapper<BookCopy>{
 		template.update("delete from tbl_book_copies where bookId = ? and branchId = ?", 
 				new Object[] { bookCopy.getBook().getBookId(), bookCopy.getBranch().getBranchId() });
 	}
-
-	public List<BookCopy> readAllBookCopys() throws SQLException {
-		return template.query("select * from tbl_book_copies", this);
-	}
-	
-	public List<BookCopy> readAllBookCopysWithPageNo(Integer pageNo, Integer pageSize) throws SQLException {
-		return template.query("select * from tbl_book_copies", new Object[] { (pageNo-1)*pageSize, pageSize }, this);
-	}
-	
-	public Integer getBookCopysCount() throws SQLException{
-		return template.queryForObject("select count(*) AS COUNT from tbl_book_copies", Integer.class);
-	}
 	
 	public BookCopy readBookCopyByIds(BookCopy bookCopy) throws SQLException{
-		return template.queryForObject("select * from tbl_book_copies where bookId = ? and branchId = ?", 
+		return template.queryForObject("select * from tbl_book_copies Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) where bookId = ? and branchId = ?", 
 				new Object[]{bookCopy.getBook().getBookId(), bookCopy.getBranch().getBranchId()}, this);
 	}
 
 	public List<BookCopy> readAllBookCopiesByBook(Book book) throws SQLException{
-		return template.query("select * from tbl_book_copies where bookId = ?)",
+		return template.query("select * from tbl_book_copies Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) where bookId = ?)",
 				new Object[] { book.getBookId()}, this);
 	}
 	
 	public List<BookCopy> readAllBookCopiesByBranch(Branch branch) throws SQLException{
-		return template.query("select * from tbl_book_copies where branchId = ?",
+		return template.query("select * from tbl_book_copies Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) where branchId = ?",
 				new Object[] { branch.getBranchId()}, this);
 	}
 
@@ -59,9 +47,11 @@ public class BookCopyDAO extends BaseDAO implements RowMapper<BookCopy>{
 		BookCopy b = new BookCopy();
 		Book book = new Book();
 		book.setBookId(rs.getInt("bookId"));
+		book.setTitle(rs.getString("title"));
 		b.setBook(book);
 		Branch branch = new Branch();
 		branch.setBranchId(rs.getInt("branchId"));
+		branch.setBranchName(rs.getString("branchName"));
 		b.setBranch(branch);
 		b.setNoOfCopies(rs.getInt("noOfCopies"));
 		return b;

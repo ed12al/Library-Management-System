@@ -9,7 +9,7 @@
 			<a href="admin/publishers">View All Publishers</a><br />
 			<a href="admin/books">View All Books</a><br />
 			<a href="admin/branches">View All Branches</a><br />
-			<a href="admin/orrowers">View All Borrowers</a><br />
+			<a href="admin/borrowers">View All Borrowers</a><br />
 			<a href="admin/loans">View All Loans</a><br />
 		</span>
 	</div>

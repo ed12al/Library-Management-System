@@ -130,7 +130,7 @@ public class BookDAO extends BaseDAO implements RowMapper<Book>{
 	}
 
 	public List<Book> readAllBooksByPublisher(Publisher publisher) throws SQLException {
-		return template.query("select * from tbl_book where bookId = ?",
+		return template.query("select * from tbl_book where pubId = ?",
 				new Object[] { publisher.getPublisherId() }, this);
 	}
 	

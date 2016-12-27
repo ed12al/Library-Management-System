@@ -32,24 +32,34 @@ public class LoanDAO extends BaseDAO implements RowMapper<Loan>{
 	}
 
 	public List<Loan> readAllLoans() throws SQLException {
-		return template.query("select * from tbl_book_loans", this);
+		return template.query("select * from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo)", this);
 	}
 	
-	public List<Loan> readAllLoansWithPageNo(Integer pageNo, Integer pageSize) throws SQLException {
-		return template.query("select * from tbl_book_loans limit ? , ?", new Object[] { (pageNo-1)*pageSize, pageSize }, this);
+	public List<Loan> readAllLoansWithPageNo(Integer pageNo, Integer pageSize, String q) throws SQLException {
+		if(q==null||q.trim().length()==0){
+			return template.query("select * from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) limit ? , ?", 
+					new Object[] { (pageNo-1)*pageSize, pageSize }, this);
+		}else{
+			q = "%"+q+"%";
+			return template.query("select * from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) where branchName like ? or name like ? or title like ? limit ? , ?", 
+					new Object[] { q, q, q, (pageNo-1)*pageSize, pageSize }, this);
+		}
 	}
 	
-	public Integer getLoansCount() throws SQLException{
-		return template.queryForObject("select count(*) AS COUNT from tbl_book_loans", Integer.class);
+	public Integer getLoansCount(String q) throws SQLException{
+		if(q==null||q.trim().length()==0){
+			return template.queryForObject("select count(*) AS COUNT from tbl_book_loans", Integer.class);
+		}else{
+			return template.queryForObject("select count(*) AS COUNT from tbl_book_loans where branchName like ? or name like ? or title like ?", new Object[] { q, q, q }, Integer.class);
+		}
 	}
-	
 	public Loan readLoanById(Loan loan) throws SQLException{
-		return template.queryForObject("select * from tbl_book_loans where loanId = ?", 
+		return template.queryForObject("select * from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) where loanId = ?", 
 				new Object[]{loan.getLoanId()}, this);
 	}
 	
 	public List<Loan> readAllLoansByBorrower(Borrower borrower) throws SQLException{
-		return template.query("select * from tbl_book_loans where cardNo = ?", new Object[] { borrower.getCardNo()}, this);
+		return template.query("select * from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) where cardNo = ?", new Object[] { borrower.getCardNo()}, this);
 	}
 
 	@Override
@@ -58,12 +68,15 @@ public class LoanDAO extends BaseDAO implements RowMapper<Loan>{
 		l.setLoanId(rs.getInt("loanId"));
 		Book book = new Book();
 		book.setBookId(rs.getInt("bookId"));
+		book.setTitle(rs.getString("title"));
 		l.setBook(book);
 		Branch branch = new Branch();
 		branch.setBranchId(rs.getInt("branchId"));
+		branch.setBranchName(rs.getString("branchName"));
 		l.setBranch(branch);
 		Borrower borrower = new Borrower();
 		borrower.setCardNo(rs.getInt("cardNo"));
+		borrower.setName(rs.getString("name"));
 		l.setBorrower(borrower);
 		l.setDateOut(rs.getDate("dateOut"));
 		l.setDateIn(rs.getDate("dateIn"));
