@@ -20,14 +20,14 @@
 <c:set var="step" value="${(pageNo-1)*10}"></c:set>
 
 <table class='table'>
-	<tr><th>#</th><th>Branch Name</th><th>View Detail</th><th>Edit Branch</th><th>Delete Branch</th></tr>
+	<tr><th>#</th><th>Branch Name</th><th>View Detail</th><th>Edit Branch</th><th>Edit Book Copies</th></tr>
 	<c:forEach items="${branches}" var="b" varStatus="status">
 		<tr>
 			<td>${status.count+step}</td>
 			<td>${b.branchName}</td>
 			<td><button class='btn btn-info' data-toggle='modal' data-target='#viewBranchModal' onclick='viewBranch(${b.branchId})'>View</button></td>
 			<td><button class='btn btn-success' data-toggle='modal' data-target='#editBranchModal' onclick='editBranch(${b.branchId})'>Edit</button></td>
-			<td><button class='btn btn-danger' data-toggle='modal' data-target='#deleteBranchModal' onclick='deleteBranch(${b.branchId})'>Delete</button></td>
+			<td><button class='btn btn-success' data-toggle='modal' data-target='#editBookCopiesModal' onclick='editBookCopies(${b.branchId})'>Edit</button></td>
 		</tr>
 	</c:forEach>
 </table>

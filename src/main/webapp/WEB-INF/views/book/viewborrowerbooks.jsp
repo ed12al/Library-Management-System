@@ -20,14 +20,13 @@
 <c:set var="step" value="${(pageNo-1)*10}"></c:set>
 
 <table class='table'>
-	<tr><th>#</th><th>Book Name</th><th>View Detail</th><th>Edit Book</th><th>Delete Book</th></tr>
+	<tr><th>#</th><th>Book Name</th><th>View Detail</th><th>Borrow Book</th></tr>
 	<c:forEach items="${books}" var="b" varStatus="status">
 		<tr>
 			<td>${status.count+step}</td>
 			<td>${b.title}</td>
 			<td><button class='btn btn-info' data-toggle='modal' data-target='#viewBookModal' onclick='viewBook(${b.bookId})'>View</button></td>
-			<td><button class='btn btn-success' data-toggle='modal' data-target='#editBookModal' onclick='editBook(${b.bookId})'>Edit</button></td>
-			<td><button class='btn btn-danger' data-toggle='modal' data-target='#deleteBookModal' onclick='deleteBook(${b.bookId})'>Delete</button></td>
+			<td><button class='btn btn-info' data-toggle='modal' data-target='#borrowBookModal' onclick='borrowBook(${b.bookId})'>Availability</button></td>
 		</tr>
 	</c:forEach>
 </table>

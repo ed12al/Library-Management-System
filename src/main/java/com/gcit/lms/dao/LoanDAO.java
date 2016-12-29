@@ -25,6 +25,11 @@ public class LoanDAO extends BaseDAO implements RowMapper<Loan>{
 		template.update("update tbl_book_loans set dueDate = ? where loanId = ?",
 				new Object[] { new java.sql.Date(loan.getDueDate().getTime()), loan.getLoanId() });
 	}
+	
+	public void returnBookByLoan(Loan loan) throws SQLException{
+		template.update("update tbl_book_loans set dateIn = ? where loanId = ? and dateIn is null",
+				new Object[] { new java.sql.Date(loan.getDateIn().getTime()), loan.getLoanId() });
+	}
 
 	public void deleteLoan(Loan loan) throws SQLException {
 		template.update("delete from tbl_book_loans where loanId = ?", 
@@ -78,8 +83,14 @@ public class LoanDAO extends BaseDAO implements RowMapper<Loan>{
 				new Object[]{loan.getLoanId()}, this);
 	}
 	
-	public List<Loan> readAllLoansByBorrower(Borrower borrower) throws SQLException{
-		return template.query("select * from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) where cardNo = ?", new Object[] { borrower.getCardNo()}, this);
+	public List<Loan> readAllLoansByBorrower(Borrower borrower, Boolean seeAll) throws SQLException{
+		if(seeAll){
+			return template.query("select * from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) where cardNo = ?", 
+					new Object[] { borrower.getCardNo()}, this);
+		}else{
+			return template.query("select * from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) where cardNo = ? and dateIn is null", 
+					new Object[] { borrower.getCardNo()}, this);
+		}
 	}
 
 	@Override

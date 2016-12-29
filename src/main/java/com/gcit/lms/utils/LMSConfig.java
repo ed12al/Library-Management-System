@@ -18,6 +18,8 @@ import com.gcit.lms.dao.GenreDAO;
 import com.gcit.lms.dao.LoanDAO;
 import com.gcit.lms.dao.PublisherDAO;
 import com.gcit.lms.service.AdminService;
+import com.gcit.lms.service.BorrowerService;
+import com.gcit.lms.service.LibrarianService;
 
 @EnableTransactionManagement
 @Configuration
@@ -56,6 +58,16 @@ public class LMSConfig {
 	@Bean
 	public AdminService adminService(){
 		return new AdminService();
+	}
+	
+	@Bean
+	public LibrarianService libService(){
+		return new LibrarianService();
+	}
+	
+	@Bean
+	public BorrowerService borService(){
+		return new BorrowerService();
 	}
 	
 	@Bean

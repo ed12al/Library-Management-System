@@ -207,7 +207,7 @@ public class AdminService {
 	
 	public Borrower getBorrowerWithDetailById(Integer cardNo) throws SQLException {
 		Borrower borrower = getBorrowerById(cardNo);
-		borrower.setLoans(ldao.readAllLoansByBorrower(borrower));
+		borrower.setLoans(ldao.readAllLoansByBorrower(borrower, true));
 		return borrower;
 	}
 	
@@ -362,7 +362,7 @@ public class AdminService {
 		bdao.addBookWithDetails(book);
 	}
 	
-	/* * * * * * * * * * * * * * * * * * * * * * * * admin: book * * * * * * * * * * * * * * * * * * * * * * * */
+	/* * * * * * * * * * * * * * * * * * * * * * * * admin: genre * * * * * * * * * * * * * * * * * * * * * * * */
 	public List<Genre> readAllGenres() throws SQLException {
 		return gdao.readAllGenres();
 	}

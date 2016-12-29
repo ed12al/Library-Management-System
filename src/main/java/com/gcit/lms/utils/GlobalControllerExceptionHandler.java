@@ -1,6 +1,7 @@
 package com.gcit.lms.utils;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ public class GlobalControllerExceptionHandler {
 	private static final Logger logger = LoggerFactory.getLogger(GlobalControllerExceptionHandler.class);
 	
 	@SuppressWarnings("rawtypes")
-	@ExceptionHandler({MySQLIntegrityConstraintViolationException.class, DataIntegrityViolationException.class, NullPointerException.class})
+	@ExceptionHandler({MySQLIntegrityConstraintViolationException.class, DataIntegrityViolationException.class, NullPointerException.class, ParseException.class})
 	public ResponseEntity handleBadRequest(Exception e){
 		logger.warn(e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request");

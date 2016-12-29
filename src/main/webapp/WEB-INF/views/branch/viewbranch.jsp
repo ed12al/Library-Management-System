@@ -16,7 +16,7 @@
 		<tr><th>#</th><th>Book Title</th><th># of Copy</th></tr>
 		<c:forEach items="${branch.bookCopy}" var="bc" varStatus="status">
 			<tr>
-				<td>${status.count+step}</td>
+				<td>${status.count}</td>
 				<td>${bc.book.title}</td>
 				<td>${bc.noOfCopies}</td>
 			</tr>

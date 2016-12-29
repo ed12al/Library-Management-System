@@ -28,7 +28,7 @@ import com.gcit.lms.service.AdminService;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 	
 	@Autowired
 	AdminService adminService;

@@ -21,6 +21,23 @@ public class BookCopyDAO extends BaseDAO implements RowMapper<BookCopy>{
 		template.update("update tbl_book_copies set noOfCopies = ? where bookId = ? and branchId = ?",
 				new Object[] { bookCopy.getNoOfCopies(), bookCopy.getBook().getBookId(), bookCopy.getBranch().getBranchId()});
 	}
+	
+	public boolean deductOneBookCopy(BookCopy bookCopy) throws SQLException {
+		Integer noOfCopies = template.queryForObject("select noOfCopies from tbl_book_copies where bookId = ? and branchId = ?",
+				new Object[] { bookCopy.getBook().getBookId(), bookCopy.getBranch().getBranchId() }, Integer.class);
+		if(noOfCopies == null || noOfCopies < 1){
+			return false;
+		}else {
+			template.update("update tbl_book_copies set noOfCopies = noOfCopies-1 where bookId = ? and branchId = ?",
+				new Object[] { bookCopy.getBook().getBookId(), bookCopy.getBranch().getBranchId()});
+			return true;
+		}
+	}
+	
+	public void addOneBookCopy(BookCopy bookCopy) {
+		template.update("update tbl_book_copies set noOfCopies = noOfCopies+1 where bookId = ? and branchId = ?",
+				new Object[] { bookCopy.getBook().getBookId(), bookCopy.getBranch().getBranchId()});
+	}
 
 	public void deleteBookCopy(BookCopy bookCopy) throws SQLException {
 		template.update("delete from tbl_book_copies where bookId = ? and branchId = ?", 
@@ -33,12 +50,12 @@ public class BookCopyDAO extends BaseDAO implements RowMapper<BookCopy>{
 	}
 
 	public List<BookCopy> readAllBookCopiesByBook(Book book) throws SQLException{
-		return template.query("select * from tbl_book_copies Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) where bookId = ?)",
+		return template.query("select * from tbl_book_copies Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) where bookId = ? and noOfCopies > 0",
 				new Object[] { book.getBookId()}, this);
 	}
 	
 	public List<BookCopy> readAllBookCopiesByBranch(Branch branch) throws SQLException{
-		return template.query("select * from tbl_book_copies Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) where branchId = ?",
+		return template.query("select * from tbl_book_copies Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) where branchId = ? and noOfCopies > 0",
 				new Object[] { branch.getBranchId()}, this);
 	}
 

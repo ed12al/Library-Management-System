@@ -10,7 +10,7 @@
 			<li ${pageNo == i ? "class='disabled'" : ""}>
 				<a href='#' ${pageNo == i ? "" : "onclick='viewAuthors(".concat(i).concat(")'")}>${i}</a></li>	
 		</c:forEach>
-		<li ${pageNo >= pages ? "class='disabled" : ""}>
+		<li ${pageNo >= pages ? "class='disabled'" : ""}>
 			<a href='#' aria-label='Next' ${pageNo < pages ? "onclick='viewAuthors(".concat(pageNo+1).concat(")'") : ""}>
 				<span aria-hidden='true'>&raquo;</span></a>
 		</li>

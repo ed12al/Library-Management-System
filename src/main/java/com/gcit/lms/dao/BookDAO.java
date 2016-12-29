@@ -13,6 +13,7 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import com.gcit.lms.entity.Author;
 import com.gcit.lms.entity.Book;
+import com.gcit.lms.entity.Branch;
 import com.gcit.lms.entity.Genre;
 import com.gcit.lms.entity.Publisher;
 
@@ -132,6 +133,11 @@ public class BookDAO extends BaseDAO implements RowMapper<Book>{
 	public List<Book> readAllBooksByPublisher(Publisher publisher) throws SQLException {
 		return template.query("select * from tbl_book where pubId = ?",
 				new Object[] { publisher.getPublisherId() }, this);
+	}
+	
+	public List<Book> readAllBooksWithNoCopyByBranch(Branch branch) throws SQLException {
+		return template.query("select * from tbl_book where bookId not in (Select bookId from tbl_book_copies where branchId = ? and noOfCopies > 0)", 
+				new Object[] { branch.getBranchId() }, this);
 	}
 	
 	@Override
