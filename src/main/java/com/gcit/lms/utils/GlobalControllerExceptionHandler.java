@@ -17,7 +17,7 @@ public class GlobalControllerExceptionHandler {
 	private static final Logger logger = LoggerFactory.getLogger(GlobalControllerExceptionHandler.class);
 	
 	@SuppressWarnings("rawtypes")
-	@ExceptionHandler({MySQLIntegrityConstraintViolationException.class, DataIntegrityViolationException.class})
+	@ExceptionHandler({MySQLIntegrityConstraintViolationException.class, DataIntegrityViolationException.class, NullPointerException.class})
 	public ResponseEntity handleBadRequest(Exception e){
 		logger.warn(e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request");

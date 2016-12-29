@@ -1,10 +1,15 @@
 package com.gcit.lms.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 import com.gcit.lms.entity.Book;
 import com.gcit.lms.entity.Genre;
@@ -14,6 +19,19 @@ public class GenreDAO extends BaseDAO implements RowMapper<Genre>{
 	public void addGenre(Genre genre) throws SQLException {
 		template.update("insert into tbl_genre (genreName) values (?)", 
 				new Object[] { genre.getGenreName() });
+	}
+	
+	public Integer addGenreWithID(Genre genre) throws SQLException{
+		String sql = "insert into tbl_genre (genreName) values (?)";
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		template.update(new PreparedStatementCreator() {
+			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+				PreparedStatement ps = connection.prepareStatement(sql, new String[] { "genreId" });
+				ps.setObject(1, genre.getGenreName());
+				return ps;
+			}
+		}, keyHolder);
+		return keyHolder.getKey().intValue();
 	}
 
 	public void updateGenre(Genre genre) throws SQLException {

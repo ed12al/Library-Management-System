@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -27,17 +26,16 @@ public class BookDAO extends BaseDAO implements RowMapper<Book>{
 	public Integer addBookWithID(Book book) throws SQLException{
 		String sql = "insert into tbl_book (title, pubId) values (?, ?)";
 		Integer pubId = book.getPublisher() == null ? null : book.getPublisher().getPublisherId();
-		KeyHolder holder = new GeneratedKeyHolder();
+		KeyHolder keyHolder = new GeneratedKeyHolder();
 		template.update(new PreparedStatementCreator() {
-			@Override
-			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-				PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-				ps.setString(1, book.getTitle());
-				ps.setInt(2, pubId);
+			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+				PreparedStatement ps = connection.prepareStatement(sql, new String[] { "bookId" });
+				ps.setObject(1, book.getTitle());
+				ps.setObject(2, pubId);
 				return ps;
 			}
-		});	
-		return holder.getKey().intValue();
+		}, keyHolder);
+		return keyHolder.getKey().intValue();
 	}
 
 	public void addBookWithDetails(Book book) throws SQLException {
@@ -66,8 +64,9 @@ public class BookDAO extends BaseDAO implements RowMapper<Book>{
 	private void addAllAuthorsByBook(Book book) throws SQLException {
 		if (book.getAuthors() != null) {
 			for (Author author : book.getAuthors()) {
-				template.update("insert into tbl_book_authors (authorId, bookId) values (?, ?)",
-						new Object[] { author.getAuthorId(), book.getBookId() });
+				if(author != null && author.getAuthorId() != null)
+					template.update("insert into tbl_book_authors (authorId, bookId) values (?, ?)",
+							new Object[] { author.getAuthorId(), book.getBookId() });
 			}
 		}
 	}
@@ -75,8 +74,9 @@ public class BookDAO extends BaseDAO implements RowMapper<Book>{
 	private void addAllGenresByBook(Book book) throws SQLException {
 		if (book.getGenres() != null) {
 			for (Genre genre : book.getGenres()) {
-				template.update("insert into tbl_book_genres (genreId, bookId) values (?, ?)",
-						new Object[] { genre.getGenreId(), book.getBookId() });
+				if(genre != null && genre.getGenreId() != null)
+					template.update("insert into tbl_book_genres (genreId, bookId) values (?, ?)",
+							new Object[] { genre.getGenreId(), book.getBookId() });
 			}
 		}
 	}

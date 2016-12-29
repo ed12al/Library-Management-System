@@ -1,6 +1,8 @@
 package com.gcit.lms.service;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +18,9 @@ import com.gcit.lms.dao.LoanDAO;
 import com.gcit.lms.dao.PublisherDAO;
 import com.gcit.lms.entity.Author;
 import com.gcit.lms.entity.Book;
-import com.gcit.lms.entity.BookCopy;
 import com.gcit.lms.entity.Borrower;
 import com.gcit.lms.entity.Branch;
+import com.gcit.lms.entity.Genre;
 import com.gcit.lms.entity.Loan;
 import com.gcit.lms.entity.Publisher;
 import com.gcit.lms.common.Constants;
@@ -53,14 +55,17 @@ public class AdminService {
 		return adao.readAllAuthorsWithPageNo(pageNo, Constants.pageSize, q);
 	}
 	
+	public List<Author> readAllAuthors() throws SQLException {
+		return adao.readAllAuthors();
+	}
+	
 	public Integer getAuthorsCount(String q) throws SQLException {
 		return adao.getAuthorsCount(q);
 	}
 	
 	public Author getAuthorWithDetailById(Integer authorId) throws SQLException {
 		Author author = getAuthorById(authorId);
-		List<Book> books = bdao.readAllBooksByAuthor(author);
-		author.setBooks(books);
+		author.setBooks(bdao.readAllBooksByAuthor(author));
 		return author;
 	}
 	
@@ -80,22 +85,26 @@ public class AdminService {
 	}
 
 	@Transactional
-	public void deleteAuthor(int authorId) throws SQLException {
+	public void deleteAuthor(Integer authorId) throws SQLException {
 		Author author = new Author();
 		author.setAuthorId(authorId);
 		adao.deleteAuthor(author);
 	}
 
 	@Transactional
-	public void addAuthor(String authorName) throws SQLException {
+	public Integer addAuthor(String authorName) throws SQLException {
 		Author author = new Author();
 		author.setAuthorName(authorName.trim().length() == 0 ? null: authorName);
-		adao.addAuthor(author);
+		return adao.addAuthorWithID(author);
 	}
 	
 	/* * * * * * * * * * * * * * * * * * * * * * * * admin: publisher * * * * * * * * * * * * * * * * * * * * * * * */
 	public List<Publisher> readAllPublishersWithPageNo(Integer pageNo, String q) throws SQLException {
 		return pdao.readAllPublishersWithPageNo(pageNo, Constants.pageSize, q);
+	}
+	
+	public List<Publisher> readAllPublishers() throws SQLException {
+		return pdao.readAllPublishers();
 	}
 	
 	public Integer getPublishersCount(String q) throws SQLException {
@@ -104,8 +113,7 @@ public class AdminService {
 	
 	public Publisher getPublisherWithDetailById(Integer publisherId) throws SQLException {
 		Publisher publisher = getPublisherById(publisherId);
-		List<Book> books = bdao.readAllBooksByPublisher(publisher);
-		publisher.setBooks(books);
+		publisher.setBooks(bdao.readAllBooksByPublisher(publisher));
 		return publisher;
 	}
 	
@@ -127,19 +135,19 @@ public class AdminService {
 	}
 
 	@Transactional
-	public void deletePublisher(int publisherId) throws SQLException {
+	public void deletePublisher(Integer publisherId) throws SQLException {
 		Publisher publisher = new Publisher();
 		publisher.setPublisherId(publisherId);
 		pdao.deletePublisher(publisher);
 	}
 
 	@Transactional
-	public void addPublisher(String publisherName, String publisherAddress, String publisherPhone) throws SQLException {
+	public Integer addPublisher(String publisherName, String publisherAddress, String publisherPhone) throws SQLException {
 		Publisher publisher = new Publisher();
 		publisher.setPublisherName(publisherName.trim().length() == 0 ? null: publisherName);
 		publisher.setPublisherAddress(publisherAddress.trim().length() == 0 ? null : publisherAddress);
 		publisher.setPublisherPhone(publisherPhone.trim().length() == 0 ? null : publisherPhone);
-		pdao.addPublisher(publisher);
+		return pdao.addPublisherWithID(publisher);
 	}
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * admin: branch * * * * * * * * * * * * * * * * * * * * * * * */
@@ -153,8 +161,7 @@ public class AdminService {
 	
 	public Branch getBranchWithDetailById(Integer branchId) throws SQLException {
 		Branch branch = getBranchById(branchId);
-		List<BookCopy> bookCopy = bcdao.readAllBookCopiesByBranch(branch);
-		branch.setBookCopy(bookCopy);
+		branch.setBookCopy(bcdao.readAllBookCopiesByBranch(branch));
 		return branch;
 	}
 	
@@ -175,7 +182,7 @@ public class AdminService {
 	}
 
 	@Transactional
-	public void deleteBranch(int branchId) throws SQLException {
+	public void deleteBranch(Integer branchId) throws SQLException {
 		Branch branch = new Branch();
 		branch.setBranchId(branchId);
 		bhdao.deleteBranch(branch);
@@ -200,8 +207,7 @@ public class AdminService {
 	
 	public Borrower getBorrowerWithDetailById(Integer cardNo) throws SQLException {
 		Borrower borrower = getBorrowerById(cardNo);
-		List<Loan> loans = ldao.readAllLoansByBorrower(borrower);
-		borrower.setLoans(loans);
+		borrower.setLoans(ldao.readAllLoansByBorrower(borrower));
 		return borrower;
 	}
 	
@@ -223,7 +229,7 @@ public class AdminService {
 	}
 
 	@Transactional
-	public void deleteBorrower(int cardNo) throws SQLException {
+	public void deleteBorrower(Integer cardNo) throws SQLException {
 		Borrower borrower = new Borrower();
 		borrower.setCardNo(cardNo);
 		brdao.deleteBorrower(borrower);
@@ -236,5 +242,135 @@ public class AdminService {
 		borrower.setAddress(borrowerAddress.trim().length() == 0 ? null : borrowerAddress);
 		borrower.setPhone(borrowerPhone.trim().length() == 0 ? null : borrowerPhone);
 		brdao.addBorrower(borrower);
+	}
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * admin: loan * * * * * * * * * * * * * * * * * * * * * * * */
+	public List<Loan> readAllLoansWithPageNo(Integer pageNo, String q, Boolean seeAll) throws SQLException {
+		return ldao.readAllLoansWithPageNo(pageNo, Constants.pageSize, q, seeAll);
+	}
+	
+	public Integer getLoansCount(String q, Boolean seeAll) throws SQLException {
+		return ldao.getLoansCount(q, seeAll);
+	}
+	
+	@Transactional
+	public void updateDueDateWithDiff(Integer loanId, Integer diff) throws SQLException {
+		Loan loan = new Loan();
+		loan.setLoanId(loanId);
+		loan = ldao.readLoanById(loan);
+		long dueDateTime = loan.getDueDate().getTime() + diff * Constants.ONE_DAY;
+		long dateOut = loan.getDateOut().getTime();
+		if(dueDateTime < dateOut){
+			throw new NullPointerException("dueDate cannot be before dateOut");
+		}
+		loan.setDueDate(new Date(dueDateTime));
+		ldao.updateDueDate(loan);
+	}
+
+	@Transactional
+	public void deleteLoan(Integer loanId) throws SQLException {
+		Loan loan = new Loan();
+		loan.setLoanId(loanId);
+		ldao.deleteLoan(loan);
+	}
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * admin: book * * * * * * * * * * * * * * * * * * * * * * * */
+	public List<Book> readAllBooksWithPageNo(Integer pageNo, String q) throws SQLException {
+		return bdao.readAllBooksWithPageNo(pageNo, Constants.pageSize, q);
+	}
+	
+	public Integer getBooksCount(String q) throws SQLException {
+		return bdao.getBooksCount(q);
+	}
+	
+	public Book getBookWithDetailById(Integer bookId) throws SQLException {
+		Book book = getBookById(bookId);
+		book.setPublisher(pdao.readPublisherByBook(book));
+		book.setAuthors(adao.readAllAuthorsByBook(book));
+		book.setGenres(gdao.readAllGenresByBook(book));
+		return book;
+	}
+	
+	public Book getBookById(Integer bookId) throws SQLException {
+		Book book = new Book();
+		book.setBookId(bookId);
+		book = bdao.readBookById(book);
+		return book;
+	}
+	
+	@Transactional
+	public void updateBookWithDetails(Integer bookId, String title, Integer publisherId, Integer[] authorIds, Integer[] genreIds) throws SQLException {
+		Book book = new Book();
+		book.setBookId(bookId);
+		book.setTitle(title.trim().length() == 0 ? null: title);
+		Publisher publisher = new Publisher();
+		publisher.setPublisherId(publisherId);
+		book.setPublisher(publisherId == null ? null: publisher);
+		if(authorIds != null) {
+			List<Author> authors = new ArrayList<>();
+			for(Integer id : authorIds){
+				Author author = new Author();
+				author.setAuthorId(id);
+				authors.add(author);
+			}
+			book.setAuthors(authors);
+		}
+		if(genreIds != null){
+			List<Genre> genres = new ArrayList<>();
+			for(Integer id : genreIds){
+				Genre genre = new Genre();
+				genre.setGenreId(id);
+				genres.add(genre);
+			}
+			book.setGenres(genres);
+		}
+		bdao.updateBookWithDetails(book);
+	}
+
+	@Transactional
+	public void deleteBook(Integer bookId) throws SQLException {
+		Book book = new Book();
+		book.setBookId(bookId);
+		bdao.deleteBook(book);
+	}
+
+	@Transactional
+	public void addBookWithDetails(String title, Integer publisherId, Integer[] authorIds, Integer[] genreIds) throws SQLException {
+		Book book = new Book();
+		book.setTitle(title.trim().length() == 0 ? null: title);
+		Publisher publisher = new Publisher();
+		publisher.setPublisherId(publisherId);
+		book.setPublisher(publisherId == null ? null: publisher);
+		if(authorIds != null) {
+			List<Author> authors = new ArrayList<>();
+			for(Integer id : authorIds){
+				Author author = new Author();
+				author.setAuthorId(id);
+				authors.add(author);
+			}
+			book.setAuthors(authors);
+		}
+		if(genreIds != null){
+			List<Genre> genres = new ArrayList<>();
+			for(Integer id : genreIds){
+				Genre genre = new Genre();
+				genre.setGenreId(id);
+				genres.add(genre);
+			}
+			book.setGenres(genres);
+		}
+		bdao.addBookWithDetails(book);
+	}
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * admin: book * * * * * * * * * * * * * * * * * * * * * * * */
+	public List<Genre> readAllGenres() throws SQLException {
+		return gdao.readAllGenres();
+	}
+	
+	@Transactional
+	public Integer addGenre(String genreName) throws SQLException {
+		Genre genre = new Genre();
+		genre.setGenreName(genreName.trim().length() == 0 ? null: genreName);
+		return gdao.addGenreWithID(genre);
 	}
 }

@@ -1,10 +1,15 @@
 package com.gcit.lms.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 import com.gcit.lms.entity.Author;
 import com.gcit.lms.entity.Book;
@@ -14,7 +19,20 @@ public class AuthorDAO extends BaseDAO implements RowMapper<Author>{
 	public void addAuthor(Author author) throws SQLException {
 		template.update("insert into tbl_author (authorName) values (?)", new Object[] { author.getAuthorName() });
 	}
-
+	
+	public Integer addAuthorWithID(Author author) throws SQLException{
+		String sql = "insert into tbl_author (authorName) values (?)";
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		template.update(new PreparedStatementCreator() {
+			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+				PreparedStatement ps = connection.prepareStatement(sql, new String[] { "authorId" });
+				ps.setObject(1, author.getAuthorName());
+				return ps;
+			}
+		}, keyHolder);
+		return keyHolder.getKey().intValue();
+	}
+	
 	public void updateAuthor(Author author) throws SQLException {
 		template.update("update tbl_author set authorName = ? where authorId = ?", new Object[] { author.getAuthorName(), author.getAuthorId() });
 	}
