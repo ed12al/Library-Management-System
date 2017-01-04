@@ -1,6 +1,6 @@
 <%@include file="template.html" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<div class="container">
 <form method="POST" action="/lms/borrower">
 	<div class="form-group">
 		<label class="control-label">Please Enter Your Card Number:</label>
@@ -11,3 +11,4 @@
 		<input class="btn btn-primary" type="submit" value="Submit">
 	</div>
 </form>
+</div>

@@ -55,7 +55,7 @@ public class LoanDAO extends BaseDAO implements RowMapper<Loan>{
 				return template.query("select * from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) where branchName like ? or name like ? or title like ? limit ? , ?", 
 						new Object[] { q, q, q, (pageNo-1)*pageSize, pageSize }, this);
 			}else{
-				return template.query("select * from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) where branchName like ? or name like ? or title like ? and dateIn is null limit ? , ?", 
+				return template.query("select * from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) where (branchName like ? or name like ? or title like ?) and dateIn is null limit ? , ?", 
 						new Object[] { q, q, q, (pageNo-1)*pageSize, pageSize }, this);
 			}
 		}
@@ -73,7 +73,7 @@ public class LoanDAO extends BaseDAO implements RowMapper<Loan>{
 			if(seeAll){
 				return template.queryForObject("select count(loanId) AS COUNT from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) where branchName like ? or name like ? or title like ?", new Object[] { q, q, q }, Integer.class);
 			}else{
-				return template.queryForObject("select count(loanId) AS COUNT from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) where branchName like ? or name like ? or title like ? and dateIn is null", new Object[] { q, q, q }, Integer.class);
+				return template.queryForObject("select count(loanId) AS COUNT from tbl_book_loans Left Join tbl_book using(bookId) Left Join tbl_library_branch using(branchId) Left Join tbl_borrower using(cardNo) where (branchName like ? or name like ? or title like ?) and dateIn is null", new Object[] { q, q, q }, Integer.class);
 			}
 		}
 	}
